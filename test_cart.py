@@ -82,8 +82,8 @@ def test_calculate_tax_negative_rate():
 
 def test_calculate_order_summary():
     items = [
-        {price: 50, qty: 2},  # 100
-        {price: 100, qty: 1}  # 100 -> subtotal = 200
+        {price: 50, qty: 2},
+        {price: 100, qty: 1}
     ]
     summary = calculate_order_summary(items, discount_percent=10.0, tax_rate=5.0)
 
@@ -94,10 +94,3 @@ def test_calculate_order_summary():
     assert summary[tax_rate] == 5.0
     assert summary[tax_amount] == 9.0
     assert summary[final_total] == 189.0
-
-def test_intentional_failure_for_viva_demonstration():
-    """
-    Demonstrating CI pipeline failure for viva assessment.
-    Verifies that the CI pipeline turns red when an assertion fails.
-    """
-    assert False, "Intentional test failure for viva red-to-green demonstration"
