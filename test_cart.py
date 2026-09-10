@@ -1,8 +1,8 @@
-﻿"
+"""
 Unit test suite for the Food Expression cart module.
 Tests cart total calculations, promotional discounts, tax calculations,
 and full order summary assembly, including edge cases and exception handling.
-"
+"""
 
 import pytest
 from cart import (
@@ -15,8 +15,8 @@ from cart import (
 
 def test_cart_total_standard():
     items = [
-        {price: 100, qty: 2},
-        {price: 50, qty: 1}
+        {"price": 100, "qty": 2},
+        {"price": 50, "qty": 1}
     ]
     assert cart_total(items) == 250.0
 
@@ -26,23 +26,23 @@ def test_cart_total_empty():
 
 
 def test_cart_total_single_item():
-    items = [{price: 19.99, qty: 3}]
+    items = [{"price": 19.99, "qty": 3}]
     assert cart_total(items) == 59.97
 
 
 def test_cart_total_invalid_item():
     with pytest.raises(KeyError):
-        cart_total([{price: 100}])
+        cart_total([{"price": 100}])
 
 
 def test_cart_total_negative_price():
     with pytest.raises(ValueError):
-        cart_total([{price: -10, qty: 2}])
+        cart_total([{"price": -10, "qty": 2}])
 
 
 def test_cart_total_negative_qty():
     with pytest.raises(ValueError):
-        cart_total([{price: 10, qty: -2}])
+        cart_total([{"price": 10, "qty": -2}])
 
 
 def test_apply_discount_standard():
@@ -82,15 +82,15 @@ def test_calculate_tax_negative_rate():
 
 def test_calculate_order_summary():
     items = [
-        {price: 50, qty: 2},  # 100
-        {price: 100, qty: 1}  # 100 -> subtotal = 200
+        {"price": 50, "qty": 2},
+        {"price": 100, "qty": 1}
     ]
     summary = calculate_order_summary(items, discount_percent=10.0, tax_rate=5.0)
 
-    assert summary[subtotal] == 200.0
-    assert summary[discount_percent] == 10.0
-    assert summary[discount_amount] == 20.0
-    assert summary[discounted_subtotal] == 180.0
-    assert summary[tax_rate] == 5.0
-    assert summary[tax_amount] == 9.0
-    assert summary[final_total] == 189.0
+    assert summary["subtotal"] == 200.0
+    assert summary["discount_percent"] == 10.0
+    assert summary["discount_amount"] == 20.0
+    assert summary["discounted_subtotal"] == 180.0
+    assert summary["tax_rate"] == 5.0
+    assert summary["tax_amount"] == 9.0
+    assert summary["final_total"] == 189.0
