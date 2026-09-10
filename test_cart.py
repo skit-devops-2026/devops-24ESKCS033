@@ -94,3 +94,10 @@ def test_calculate_order_summary():
     assert summary[tax_rate] == 5.0
     assert summary[tax_amount] == 9.0
     assert summary[final_total] == 189.0
+
+def test_intentional_failure_for_viva_demonstration():
+    """
+    Demonstrating CI pipeline failure for viva assessment.
+    Verifies that the CI pipeline turns red when an assertion fails.
+    """
+    assert False, "Intentional test failure for viva red-to-green demonstration"
