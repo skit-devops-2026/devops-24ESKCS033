@@ -1,4 +1,4 @@
-﻿# Byte-compiled / optimized / DLL files
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *.class
@@ -75,4 +75,4 @@ Thumbs.db
 *.key
 
 # Local workspace scratch
-devops/
+# (devops/ removed because it ignored the entire repo root folder)
