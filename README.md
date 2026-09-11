@@ -1,6 +1,6 @@
-﻿# Food Expression
+# Food Expression
 
-[![CI Pipeline](https://github.com/guptaakshat6917-cell/food-expression/actions/workflows/ci.yml/badge.svg)](https://github.com/guptaakshat6917-cell/food-expression/actions/workflows/ci.yml)
+[![CI Pipeline](https://github.com/skit-devops-2026/devops-24ESKCS033/actions/workflows/ci.yml/badge.svg)](https://github.com/skit-devops-2026/devops-24ESKCS033/actions/workflows/ci.yml)
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
@@ -47,8 +47,8 @@ food-expression/
 
 1. Clone the repository:
    `ash
-   git clone https://github.com/guptaakshat6917-cell/food-expression.git
-   cd food-expression
+   git clone https://github.com/skit-devops-2026/devops-24ESKCS033.git
+   cd devops-24ESKCS033
    `
 
 2. Create and activate a virtual environment:
