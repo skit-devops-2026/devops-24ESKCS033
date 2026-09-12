@@ -1,124 +1,131 @@
-# Food Expression
+# 🏠 RealEstate – Property Discovery Platform
 
 [![CI Pipeline](https://github.com/skit-devops-2026/devops-24ESKCS033/actions/workflows/ci.yml/badge.svg)](https://github.com/skit-devops-2026/devops-24ESKCS033/actions/workflows/ci.yml)
-[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![Repository Status](https://img.shields.io/badge/DevOps-MT1%20Completed-brightgreen)](https://github.com/skit-devops-2026/devops-24ESKCS033)
 
-**Food Expression** is a modular Python-based order calculation and shopping cart engine designed for modern food delivery and restaurant platforms. It provides reliable, well-tested business logic for computing cart totals, applying promotional discounts with strict validation, calculating regional sales tax, and assembling final order summaries.
-
----
-
-## Features
-
-- **Cart Subtotal Calculation**: Safely computes totals across multi-item orders accounting for unit pricing and quantities.
-- **Discount Engine**: Validates discount boundaries (0% to 100%) and accurately applies promotional reductions.
-- **Tax Calculation**: Calculates sales tax based on applicable rates with robust input verification.
-- **Order Summary Generation**: Produces comprehensive order breakdowns including subtotal, discount, taxable base, tax amount, and net payable total.
-- **Automated Testing Suite**: High-coverage unit tests powered by pytest.
-- **CI/CD Pipelines**: Continuous Integration configured via GitHub Actions and enterprise automation ready via Jenkins.
+A modern and responsive **Real Estate Property Discovery Platform** developed as part of the DevOps Course (Modules 1–4). The application provides an intuitive interface for users to discover properties, apply filters, save favourite properties, view detailed property cards, and list new properties.
 
 ---
 
-## Project Structure
+## 🌐 Live Repository
 
-`
-food-expression/
+- **Repository URL**: [https://github.com/skit-devops-2026/devops-24ESKCS019](https://github.com/skit-devops-2026/devops-24ESKCS033)
+- **Course**: DevOps (24ESKCS033)
+
+---
+
+## 📌 Project Overview
+
+**RealEstate** is a web-based property discovery platform designed to simplify searching and exploring residential and commercial properties.
+
+Key Features:
+- 🔍 **Search Properties** by location, keyword, or title.
+- 🏢 **Filter Properties** by type (Apartments, Villas, Penthouses, Commercial).
+- 💰 **Filter by Price Range** and bedroom count (BHK).
+- 🛋️ **Furnishing Status Filters** (Furnished, Semi-Furnished, Unfurnished).
+- ❤️ **Wishlist Integration** to save favourite properties.
+- 📋 **Property Details View** with complete metadata.
+- 🏡 **Submit Property Listings** through an interactive modal.
+- 🔐 **Authentication UI** for Sign In, Account Creation, and Password Reset.
+- 📱 **Multiple Layout Views** (Grid View, List View, and Map View).
+- 🎥 **Virtual Property Tours** modal support.
+
+---
+
+## 🛠️ Technologies Used
+
+| Technology / Tool | Purpose |
+| ----------------- | ------- |
+| **HTML5 & CSS3**  | Structured markups, responsive styling, flex/grid layouts |
+| **JavaScript (ES6+)** | Frontend application logic, DOM manipulation, state management |
+| **Python & unittest** | Automated unit testing framework for project validation |
+| **GitHub Actions** | Automated CI pipeline for continuous integration testing |
+| **Jenkins**       | Declarative Jenkinsfile pipeline automation |
+| **Font Awesome & Google Fonts** | UI icons and modern typography |
+
+---
+
+## 📂 Project Structure
+
+```text
+devops-24ESKCS019/
 ├── .github/
 │   └── workflows/
-│       └── ci.yml             # GitHub Actions CI automated test workflow
-├── cart.py                    # Core business logic for cart and checkout
-├── test_cart.py               # Automated unit test suite (pytest)
-├── Jenkinsfile                # Declarative Jenkins CI/CD pipeline definition
-├── .gitignore                 # Repository ignore rules (prevents build artifacts)
-└── README.md                  # Project documentation and developer guide
-`
+│       └── ci.yml          # GitHub Actions CI Workflow
+├── tests/
+│   ├── __init__.py
+│   ├── test_properties.py # Unit tests for application logic & data
+│   └── test_html_structure.py # Unit tests for DOM & HTML metadata
+├── index.html              # Main frontend HTML markup
+├── style.css               # Application stylesheet
+├── script.js               # Interactive JavaScript logic
+├── Jenkinsfile             # Jenkins Declarative CI/CD Pipeline
+├── .gitignore              # Ignored files and build artifacts
+└── README.md               # Project documentation
+```
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
-### Prerequisites
+### 1. Clone the Repository
 
-- Python 3.8 or higher
-- Git
-- pip package manager
+```bash
+git clone https://github.com/skit-devops-2026/devops-24ESKCS019.git
+cd devops-24ESKCS019
+```
 
-### Installation
+### 2. Run the Web Application
 
-1. Clone the repository:
-   `ash
-   git clone https://github.com/skit-devops-2026/devops-24ESKCS033.git
-   cd devops-24ESKCS033
-   `
+Since this is a client-side frontend project, open `index.html` in any modern web browser or run using VS Code Live Server / Python HTTP server:
 
-2. Create and activate a virtual environment:
-   `ash
-   python -m venv venv
-   # On Windows:
-   venv\Scripts\activate
-   # On macOS/Linux:
-   source venv/bin/activate
-   `
+```bash
+# Using Python builtin HTTP server
+python -m http.server 8000
+```
 
-3. Install testing dependencies:
-   `ash
-   pip install pytest pytest-cov flake8
-   `
+Then visit `http://localhost:8000` in your web browser.
 
 ---
 
-## Running Tests Locally
+## 🧪 Running Automated Tests
 
-Run the complete test suite using pytest:
+The repository includes an automated Python test suite under the `tests/` directory:
 
-`ash
-pytest -v
-`
+```bash
+# Run unit tests locally
+python -m unittest discover -s tests -p "test_*.py" -v
+```
 
-To run tests with code coverage:
-
-`ash
-pytest --cov=cart --cov-report=term-missing
-`
-
-To run lint checks:
-
-`ash
-flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-`
+All tests execute automatically on every push and pull request via **GitHub Actions CI**.
 
 ---
 
-## CI/CD Pipeline
+## ⚙️ CI/CD & Automation Pipelines
 
-### GitHub Actions (.github/workflows/ci.yml)
+### GitHub Actions CI Pipeline (`.github/workflows/ci.yml`)
+- Triggers automatically on `push` and `pull_request` to `main` and feature branches.
+- Sets up Python environment, verifies dependencies, and executes unit test suite.
 
-The repository includes a GitHub Actions workflow that automatically executes on:
-- Every push to any branch.
-- Every pull_request targeting the main branch.
-- Manual trigger (workflow_dispatch).
-
-The pipeline performs:
-1. Multi-version testing against Python 3.10 and 3.11.
-2. Dependency installation (pytest, lake8).
-3. Code quality inspection and lint checks.
-4. Execution of the automated test suite with JUnit XML reporting.
-
-### Jenkins Pipeline (Jenkinsfile)
-
-A declarative Jenkins pipeline is provided to execute automated builds on local or dedicated Jenkins nodes.
-Stages include:
-1. **Checkout**: Retrieves source code from Git SCM.
-2. **Setup**: Prepares Python virtual environment and installs requirements.
-3. **Lint**: Validates syntax and code cleanliness with Flake8.
-4. **Test**: Executes tests and generates JUnit-compatible test reports.
-5. **Archive**: Collects and archives test artifacts and results.
+### Jenkins Pipeline (`Jenkinsfile`)
+- Declarative pipeline with standard stages:
+  1. **Checkout**: Retrieves source code.
+  2. **Environment & Setup**: Verifies tool versions and workspace setup.
+  3. **Lint & Validation**: Validates file integrity and HTML structure.
+  4. **Automated Unit Tests**: Runs the test suite via `python -m unittest`.
+  5. **Build Artifacts**: Prepares build bundle summary.
 
 ---
 
-## Git Workflow & Branching Strategy
+## 👨‍💻 Author & Course Information
 
-Development follows standard Git Flow and Pull Request conventions:
-- main: Production-ready, stable code branch. All changes are merged deliberately via reviewed Pull Requests.
-- eature/*: Short-lived feature branches for bug fixes, enhancements, and CI/CD integration.
-- Direct pushes to main are avoided in favor of documented, traceable pull requests.
+- **Student / Author**: Akshat Gupta
+- **Repository Owner**: `skit-devops-2026`
+- **Course**: DevOps (24ESKCS033)
+- **Assignment**: MT1 (Modules 1–4)
+
+---
+
+## 📄 License
+
+Developed for academic and educational evaluation.
