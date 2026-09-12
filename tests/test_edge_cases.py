@@ -2,24 +2,100 @@
 Additional edge-case tests for the RealEstate Property Discovery Platform.
 Validates boundary conditions, empty inputs, and stress scenarios.
 
+All helper functions are defined inline to avoid cross-module import issues.
+
 Student: Akshat Gupta | 24ESKCS019
 Course:  DevOps (MT1 – Modules 1-4)
 """
 
 import unittest
-from tests.test_properties import (
-    PROPERTIES,
-    filter_by_type,
-    filter_by_price,
-    filter_by_bedrooms,
-    filter_by_furnishing,
-    search_properties,
-    calculate_price_per_sqft,
-    add_to_wishlist,
-    remove_from_wishlist,
-    sort_properties,
-)
 
+
+# ---------------------------------------------------------------------------
+# Inline property data and helpers (mirrors test_properties.py)
+# ---------------------------------------------------------------------------
+
+PROPERTIES = [
+    {
+        "id": 1, "title": "Luxury Sky Villa", "type": "Villa",
+        "price": 15000000, "bedrooms": 4, "location": "Mumbai",
+        "furnishing": "Furnished", "area": 3200,
+    },
+    {
+        "id": 2, "title": "Modern Studio Apartment", "type": "Apartment",
+        "price": 4500000, "bedrooms": 1, "location": "Bangalore",
+        "furnishing": "Semi-Furnished", "area": 650,
+    },
+    {
+        "id": 3, "title": "Premium Penthouse", "type": "Penthouse",
+        "price": 35000000, "bedrooms": 5, "location": "Delhi",
+        "furnishing": "Furnished", "area": 5500,
+    },
+    {
+        "id": 4, "title": "Commercial Office Space", "type": "Commercial",
+        "price": 8000000, "bedrooms": 0, "location": "Hyderabad",
+        "furnishing": "Unfurnished", "area": 2100,
+    },
+    {
+        "id": 5, "title": "Cosy 2BHK Apartment", "type": "Apartment",
+        "price": 6200000, "bedrooms": 2, "location": "Pune",
+        "furnishing": "Semi-Furnished", "area": 950,
+    },
+]
+
+
+def filter_by_type(properties, prop_type):
+    if not prop_type or prop_type.lower() == "all":
+        return properties
+    return [p for p in properties if p["type"].lower() == prop_type.lower()]
+
+
+def filter_by_price(properties, min_price=0, max_price=float("inf")):
+    return [p for p in properties if min_price <= p["price"] <= max_price]
+
+
+def filter_by_bedrooms(properties, bedrooms):
+    if bedrooms is None:
+        return properties
+    return [p for p in properties if p["bedrooms"] == bedrooms]
+
+
+def filter_by_furnishing(properties, furnishing):
+    if not furnishing:
+        return properties
+    return [p for p in properties if p["furnishing"].lower() == furnishing.lower()]
+
+
+def search_properties(properties, query):
+    q = query.strip().lower()
+    if not q:
+        return properties
+    return [p for p in properties if q in p["title"].lower() or q in p["location"].lower()]
+
+
+def calculate_price_per_sqft(price, area):
+    if area <= 0:
+        raise ValueError("Area must be greater than zero.")
+    return round(price / area, 2)
+
+
+def add_to_wishlist(wishlist, property_id):
+    wishlist.add(property_id)
+    return wishlist
+
+
+def remove_from_wishlist(wishlist, property_id):
+    wishlist.discard(property_id)
+    return wishlist
+
+
+def sort_properties(properties, key="price", reverse=False):
+    return sorted(properties, key=lambda p: p.get(key, 0), reverse=reverse)
+
+
+# ---------------------------------------------------------------------------
+# Test Cases
+# ---------------------------------------------------------------------------
 
 class TestEdgeCasesEmptyDataset(unittest.TestCase):
     """Tests with an empty property dataset."""
@@ -84,7 +160,6 @@ class TestSearchEdgeCases(unittest.TestCase):
         self.assertEqual(len(result), len(PROPERTIES))
 
     def test_search_single_character(self):
-        # 'a' matches many titles/locations
         result = search_properties(PROPERTIES, "a")
         self.assertGreater(len(result), 0)
 
@@ -113,7 +188,7 @@ class TestFilterChaining(unittest.TestCase):
 
     def test_all_filters_returning_empty(self):
         results = filter_by_type(PROPERTIES, "Villa")
-        results = filter_by_price(results, 0, 100)   # way too low price
+        results = filter_by_price(results, 0, 100)
         self.assertEqual(results, [])
 
     def test_chain_does_not_mutate_original(self):
