@@ -55,6 +55,7 @@ venv.bak/
 
 # Node / Build artifacts
 node_modules/
+dist/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -73,6 +74,22 @@ Thumbs.db
 .env.*
 *.pem
 *.key
+*.secret
+secrets.json
 
-# Local workspace scratch
-# (devops/ removed because it ignored the entire repo root folder)
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V7
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.orig
+*.log
