@@ -9,8 +9,9 @@ A modern and responsive **Real Estate Property Discovery Platform** developed as
 
 ## 🌐 Live Repository
 
-- **Repository URL**: [https://github.com/skit-devops-2026/devops-24ESKCS019](https://github.com/skit-devops-2026/devops-24ESKCS033)
+- **Repository URL**: [https://github.com/skit-devops-2026/devops-24ESKCS033](https://github.com/skit-devops-2026/devops-24ESKCS033)
 - **Course**: DevOps (24ESKCS033)
+- **Student ID**: 24ESKCS019
 
 ---
 
@@ -48,13 +49,13 @@ Key Features:
 ## 📂 Project Structure
 
 ```text
-devops-24ESKCS019/
+devops-24ESKCS033/
 ├── .github/
 │   └── workflows/
 │       └── ci.yml          # GitHub Actions CI Workflow
 ├── tests/
 │   ├── __init__.py
-│   ├── test_properties.py # Unit tests for application logic & data
+│   ├── test_properties.py  # Unit tests for application logic & data
 │   └── test_html_structure.py # Unit tests for DOM & HTML metadata
 ├── index.html              # Main frontend HTML markup
 ├── style.css               # Application stylesheet
@@ -71,8 +72,8 @@ devops-24ESKCS019/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/skit-devops-2026/devops-24ESKCS019.git
-cd devops-24ESKCS019
+git clone https://github.com/skit-devops-2026/devops-24ESKCS033.git
+cd devops-24ESKCS033
 ```
 
 ### 2. Run the Web Application
@@ -93,7 +94,13 @@ Then visit `http://localhost:8000` in your web browser.
 The repository includes an automated Python test suite under the `tests/` directory:
 
 ```bash
+# Install test dependencies
+pip install pytest pytest-cov flake8
+
 # Run unit tests locally
+python -m pytest tests/ -v
+
+# Run with unittest discover
 python -m unittest discover -s tests -p "test_*.py" -v
 ```
 
@@ -105,24 +112,30 @@ All tests execute automatically on every push and pull request via **GitHub Acti
 
 ### GitHub Actions CI Pipeline (`.github/workflows/ci.yml`)
 - Triggers automatically on `push` and `pull_request` to `main` and feature branches.
-- Sets up Python environment, verifies dependencies, and executes unit test suite.
+- Runs on Python **3.10** and **3.11** (matrix strategy).
+- Sets up Python environment, runs Flake8 linting, and executes the full unit test suite.
+- Uploads JUnit XML test reports as build artifacts.
 
 ### Jenkins Pipeline (`Jenkinsfile`)
 - Declarative pipeline with standard stages:
   1. **Checkout**: Retrieves source code.
-  2. **Environment & Setup**: Verifies tool versions and workspace setup.
-  3. **Lint & Validation**: Validates file integrity and HTML structure.
-  4. **Automated Unit Tests**: Runs the test suite via `python -m unittest`.
-  5. **Build Artifacts**: Prepares build bundle summary.
+  2. **Environment Info**: Verifies tool versions and workspace setup.
+  3. **Setup Virtualenv**: Creates Python venv and installs dependencies.
+  4. **Lint & Code Quality**: Runs Flake8 static analysis.
+  5. **Run Unit Tests**: Executes the test suite via `pytest`.
+  6. **Archive Test Results**: Collects and stores JUnit XML reports.
 
 ---
 
 ## 👨‍💻 Author & Course Information
 
 - **Student / Author**: Akshat Gupta
+- **Student ID**: 24ESKCS019
 - **Repository Owner**: `skit-devops-2026`
+- **Repository**: `devops-24ESKCS033`
 - **Course**: DevOps (24ESKCS033)
 - **Assignment**: MT1 (Modules 1–4)
+- **Due Date**: 5 September 2026
 
 ---
 
