@@ -162,13 +162,16 @@ jobs:
           kubectl cluster-info --context kind-realestate
           echo "✅ kind cluster 'realestate' created"
 
-      - name: Patch deployment.yaml with ghcr.io image
+      - name: Patch deployment.yaml with ghcr.io image and IfNotPresent policy
         run: |
           IMAGE="ghcr.io/${{ github.repository_owner }}/realestate-platform:latest"
           IMAGE=$(echo "$IMAGE" | tr '[:upper:]' '[:lower:]')
           echo "Patching deployment.yaml → image: $IMAGE"
           sed -i "s|akshat2026/realestate-platform:latest|$IMAGE|g" k8s/deployment.yaml
-          grep "image:" k8s/deployment.yaml
+          # Use IfNotPresent so kind uses the locally loaded image (not trying to pull again)
+          sed -i "s|imagePullPolicy: Always|imagePullPolicy: IfNotPresent|g" k8s/deployment.yaml
+          echo "--- Final deployment.yaml image section ---"
+          grep -A2 "image:" k8s/deployment.yaml
 
       - name: Pull image and load into kind cluster
         run: |
@@ -178,6 +181,8 @@ jobs:
           docker pull "$IMAGE"
           kind load docker-image "$IMAGE" --name realestate
           echo "✅ Image loaded into kind cluster"
+          # Verify image is in kind
+          docker exec realestate-control-plane crictl images | grep realestate || true
 
       - name: Apply Kubernetes manifests
         run: |
@@ -189,8 +194,21 @@ jobs:
 
       - name: Wait for deployment to be Ready
         run: |
-          kubectl rollout status deployment/realestate-deployment --timeout=120s
+          echo "Waiting for pods to be scheduled..."
+          sleep 10
+          kubectl get pods -o wide
+          kubectl rollout status deployment/realestate-deployment --timeout=180s
           echo "✅ All pods reached Ready state"
+
+      - name: Debug pod status on failure
+        if: failure()
+        run: |
+          echo "=== Pod Status ==="
+          kubectl get pods -o wide
+          echo "=== Pod Events ==="
+          kubectl describe pods -l app=realestate
+          echo "=== Node Status ==="
+          kubectl get nodes
 
       - name: Capture verification output
         run: |
