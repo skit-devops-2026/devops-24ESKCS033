@@ -2,8 +2,8 @@
 # Kubernetes Deployment Manifest
 # RealEstate – Property Discovery Platform
 # ============================================================
-# Image: akshat2026/realestate-platform:latest
-# Registry: Docker Hub
+# Image: ghcr.io/skit-devops-2026/realestate-platform:latest
+# Registry: GitHub Container Registry (ghcr.io)
 # ============================================================
 
 apiVersion: apps/v1
@@ -45,8 +45,8 @@ spec:
     spec:
       containers:
         - name: realestate
-          # Image pushed to Docker Hub in M5
-          image: akshat2026/realestate-platform:latest
+          # Image pushed to ghcr.io via GitHub Actions in M5
+          image: ghcr.io/skit-devops-2026/realestate-platform:latest
           imagePullPolicy: Always
 
           # Container port the Python HTTP server listens on

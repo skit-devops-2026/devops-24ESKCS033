@@ -1,9 +1,10 @@
 # 🏠 RealEstate – Property Discovery Platform
 
 [![CI Pipeline](https://github.com/skit-devops-2026/devops-24ESKCS033/actions/workflows/ci.yml/badge.svg)](https://github.com/skit-devops-2026/devops-24ESKCS033/actions/workflows/ci.yml)
+[![Docker Pipeline](https://github.com/skit-devops-2026/devops-24ESKCS033/actions/workflows/docker.yml/badge.svg)](https://github.com/skit-devops-2026/devops-24ESKCS033/actions/workflows/docker.yml)
 [![Repository Status](https://img.shields.io/badge/DevOps-M5%20M6%20M7%20Completed-brightgreen)](https://github.com/skit-devops-2026/devops-24ESKCS033)
-[![Docker Image](https://img.shields.io/badge/Docker%20Hub-akshat2026%2Frealestate--platform-blue?logo=docker)](https://hub.docker.com/r/akshat2026/realestate-platform)
-[![Deploy on Render](https://img.shields.io/badge/Deployed%20on-Render-46E3B7?logo=render)](https://realestate-platform-24eskcs033.onrender.com)
+[![Container Registry](https://img.shields.io/badge/ghcr.io-realestate--platform-blue?logo=github)](https://github.com/skit-devops-2026/devops-24ESKCS033/pkgs/container/realestate-platform)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-brightgreen?logo=github)](https://skit-devops-2026.github.io/devops-24ESKCS033)
 
 A modern and responsive **Real Estate Property Discovery Platform** developed as part of the DevOps Course (Modules 1–7). The application provides an intuitive interface for users to discover properties, apply filters, save favourite properties, view detailed property cards, and list new properties.
 
@@ -19,21 +20,22 @@ A modern and responsive **Real Estate Property Discovery Platform** developed as
 
 ## 🚀 Live Demo
 
-https://realestate-platform-24eskcs033.onrender.com
+https://skit-devops-2026.github.io/devops-24ESKCS033
 
-> Deployed via Docker container on Render.com. The application serves the static RealEstate frontend using Python's built-in HTTP server.
+> Deployed automatically via GitHub Actions to GitHub Pages on every push to `main`.
 
 ---
 
-## 🐳 Docker Hub
+## 🐳 Container Registry (ghcr.io)
 
-- **Registry Image**: `akshat2026/realestate-platform:latest`
-- **Docker Hub URL**: [https://hub.docker.com/r/akshat2026/realestate-platform](https://hub.docker.com/r/akshat2026/realestate-platform)
+- **Registry**: GitHub Container Registry (ghcr.io) — no external account needed
+- **Image**: `ghcr.io/skit-devops-2026/realestate-platform:latest`
+- **Package URL**: [https://github.com/skit-devops-2026/devops-24ESKCS033/pkgs/container/realestate-platform](https://github.com/skit-devops-2026/devops-24ESKCS033/pkgs/container/realestate-platform)
 
 ```bash
 # Pull and run the image
-docker pull akshat2026/realestate-platform:latest
-docker run -d -p 8000:8000 akshat2026/realestate-platform:latest
+docker pull ghcr.io/skit-devops-2026/realestate-platform:latest
+docker run -d -p 8000:8000 ghcr.io/skit-devops-2026/realestate-platform:latest
 # Open http://localhost:8000
 ```
 
@@ -172,10 +174,11 @@ All tests execute automatically on every push and pull request via **GitHub Acti
 
 | Step | Command |
 |------|---------|
-| Build image | `docker build -t akshat2026/realestate-platform:latest .` |
-| Run container | `docker run -d -p 8000:8000 akshat2026/realestate-platform:latest` |
+| Build image | `docker build -t ghcr.io/skit-devops-2026/realestate-platform:latest .` |
+| Run container | `docker run -d -p 8000:8000 ghcr.io/skit-devops-2026/realestate-platform:latest` |
 | Docker Compose | `docker compose up -d` |
-| Push to registry | `docker push akshat2026/realestate-platform:latest` |
+| Push to registry | Automated via `.github/workflows/docker.yml` on every push to `main` |
+| Registry URL | `ghcr.io/skit-devops-2026/realestate-platform:latest` |
 
 ---
 

@@ -13,8 +13,8 @@ services:
       context: .
       dockerfile: Dockerfile
 
-    # Image name for the container
-    image: akshat2026/realestate-platform:latest
+    # Image name — published to GitHub Container Registry
+    image: ghcr.io/skit-devops-2026/realestate-platform:latest
 
     # Container name for easy reference
     container_name: realestate-app
