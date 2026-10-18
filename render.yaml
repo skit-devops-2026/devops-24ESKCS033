@@ -1,0 +1,22 @@
+# ============================================================
+# Render.com Deployment Configuration
+# RealEstate – Property Discovery Platform
+# ============================================================
+
+services:
+  - type: web
+    name: realestate-platform
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+
+    # Environment variables
+    envVars:
+      - key: PORT
+        value: 8000
+
+    # Health check path
+    healthCheckPath: /
+
+    # Auto-deploy on push to main
+    autoDeploy: true

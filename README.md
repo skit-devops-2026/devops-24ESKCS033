@@ -1,9 +1,11 @@
 # 🏠 RealEstate – Property Discovery Platform
 
 [![CI Pipeline](https://github.com/skit-devops-2026/devops-24ESKCS033/actions/workflows/ci.yml/badge.svg)](https://github.com/skit-devops-2026/devops-24ESKCS033/actions/workflows/ci.yml)
-[![Repository Status](https://img.shields.io/badge/DevOps-MT1%20Completed-brightgreen)](https://github.com/skit-devops-2026/devops-24ESKCS033)
+[![Repository Status](https://img.shields.io/badge/DevOps-M5%20M6%20M7%20Completed-brightgreen)](https://github.com/skit-devops-2026/devops-24ESKCS033)
+[![Docker Image](https://img.shields.io/badge/Docker%20Hub-akshat2026%2Frealestate--platform-blue?logo=docker)](https://hub.docker.com/r/akshat2026/realestate-platform)
+[![Deploy on Render](https://img.shields.io/badge/Deployed%20on-Render-46E3B7?logo=render)](https://realestate-platform-24eskcs033.onrender.com)
 
-A modern and responsive **Real Estate Property Discovery Platform** developed as part of the DevOps Course (Modules 1–4). The application provides an intuitive interface for users to discover properties, apply filters, save favourite properties, view detailed property cards, and list new properties.
+A modern and responsive **Real Estate Property Discovery Platform** developed as part of the DevOps Course (Modules 1–7). The application provides an intuitive interface for users to discover properties, apply filters, save favourite properties, view detailed property cards, and list new properties.
 
 ---
 
@@ -12,6 +14,28 @@ A modern and responsive **Real Estate Property Discovery Platform** developed as
 - **Repository URL**: [https://github.com/skit-devops-2026/devops-24ESKCS033](https://github.com/skit-devops-2026/devops-24ESKCS033)
 - **Course**: DevOps (24ESKCS033)
 - **Student ID**: 24ESKCS019
+
+---
+
+## 🚀 Live Demo
+
+https://realestate-platform-24eskcs033.onrender.com
+
+> Deployed via Docker container on Render.com. The application serves the static RealEstate frontend using Python's built-in HTTP server.
+
+---
+
+## 🐳 Docker Hub
+
+- **Registry Image**: `akshat2026/realestate-platform:latest`
+- **Docker Hub URL**: [https://hub.docker.com/r/akshat2026/realestate-platform](https://hub.docker.com/r/akshat2026/realestate-platform)
+
+```bash
+# Pull and run the image
+docker pull akshat2026/realestate-platform:latest
+docker run -d -p 8000:8000 akshat2026/realestate-platform:latest
+# Open http://localhost:8000
+```
 
 ---
 
@@ -52,17 +76,34 @@ Key Features:
 devops-24ESKCS033/
 ├── .github/
 │   └── workflows/
-│       └── ci.yml          # GitHub Actions CI Workflow
+│       └── ci.yml              # GitHub Actions CI Workflow
 ├── tests/
 │   ├── __init__.py
-│   ├── test_properties.py  # Unit tests for application logic & data
-│   └── test_html_structure.py # Unit tests for DOM & HTML metadata
-├── index.html              # Main frontend HTML markup
-├── style.css               # Application stylesheet
-├── script.js               # Interactive JavaScript logic
-├── Jenkinsfile             # Jenkins Declarative CI/CD Pipeline
-├── .gitignore              # Ignored files and build artifacts
-└── README.md               # Project documentation
+│   ├── test_properties.py      # Unit tests for application logic & data
+│   └── test_html_structure.py  # Unit tests for DOM & HTML metadata
+│
+├── monitoring/                 # M6 – Prometheus & Grafana config
+│   ├── prometheus.yml          # Prometheus scrape configuration
+│   └── dashboard.json          # Grafana monitoring dashboard
+│
+├── k8s/                        # M7 – Kubernetes manifests
+│   ├── deployment.yaml         # Kubernetes Deployment (2 replicas)
+│   └── service.yaml            # Kubernetes NodePort Service
+│
+├── docs/                       # M6/M7 – Deployment evidence
+│   ├── deployment.png          # Screenshot of live deployment
+│   └── kubernetes-pods.png     # Screenshot of kubectl get pods
+│
+├── index.html                  # Main frontend HTML markup
+├── style.css                   # Application stylesheet
+├── script.js                   # Interactive JavaScript logic
+├── Dockerfile                  # M5 – Production Docker image
+├── docker-compose.yml          # M5 – Docker Compose configuration
+├── render.yaml                 # M6 – Render.com deployment config
+├── .env.example                # Environment variable template
+├── Jenkinsfile                 # Jenkins Declarative CI/CD Pipeline
+├── .gitignore                  # Ignored files and build artifacts
+└── README.md                   # Project documentation
 ```
 
 ---
@@ -127,6 +168,52 @@ All tests execute automatically on every push and pull request via **GitHub Acti
 
 ---
 
+## 🐳 M5 — Containerization
+
+| Step | Command |
+|------|---------|
+| Build image | `docker build -t akshat2026/realestate-platform:latest .` |
+| Run container | `docker run -d -p 8000:8000 akshat2026/realestate-platform:latest` |
+| Docker Compose | `docker compose up -d` |
+| Push to registry | `docker push akshat2026/realestate-platform:latest` |
+
+---
+
+## 📊 M6 — Monitoring
+
+Prometheus + Grafana monitoring is configured under `monitoring/`.
+
+- **`monitoring/prometheus.yml`** — Scrape configuration using blackbox exporter for HTTP probing and node exporter for system metrics.
+- **`monitoring/dashboard.json`** — Grafana dashboard with 8 panels: app availability, HTTP response time, status codes, CPU %, memory %, and probe success rate.
+
+Import the dashboard via Grafana UI → Dashboards → Import → Upload `monitoring/dashboard.json`.
+
+---
+
+## ☸️ M7 — Kubernetes
+
+Kubernetes manifests are under `k8s/`. Uses the Docker Hub image.
+
+```bash
+# Create kind cluster
+kind create cluster --name realestate
+
+# Deploy
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+
+# Verify
+kubectl get deployments
+kubectl get pods
+kubectl get services
+
+# Access (kind port-forward)
+kubectl port-forward service/realestate-service 8080:80
+# Open http://localhost:8080
+```
+
+---
+
 ## 👨‍💻 Author & Course Information
 
 - **Student / Author**: Akshat Gupta
@@ -134,7 +221,7 @@ All tests execute automatically on every push and pull request via **GitHub Acti
 - **Repository Owner**: `skit-devops-2026`
 - **Repository**: `devops-24ESKCS033`
 - **Course**: DevOps (24ESKCS033)
-- **Assignment**: MT1 (Modules 1–4)
+- **Assignment**: MT1–MT2 (Modules 1–7)
 - **Due Date**: 5 September 2026
 
 ---

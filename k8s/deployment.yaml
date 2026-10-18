@@ -1,0 +1,93 @@
+# ============================================================
+# Kubernetes Deployment Manifest
+# RealEstate – Property Discovery Platform
+# ============================================================
+# Image: akshat2026/realestate-platform:latest
+# Registry: Docker Hub
+# ============================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: realestate-deployment
+  namespace: default
+  labels:
+    app: realestate
+    project: realestate-platform
+    course: devops-24ESKCS033
+    student: 24ESKCS019
+  annotations:
+    description: "RealEstate Property Discovery Platform – static site served via Python HTTP server"
+
+spec:
+  # Number of pod replicas for availability
+  replicas: 2
+
+  # Pod selector – must match template labels
+  selector:
+    matchLabels:
+      app: realestate
+
+  # Rolling update strategy
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
+  template:
+    metadata:
+      labels:
+        app: realestate
+        project: realestate-platform
+        version: "1.0.0"
+
+    spec:
+      containers:
+        - name: realestate
+          # Image pushed to Docker Hub in M5
+          image: akshat2026/realestate-platform:latest
+          imagePullPolicy: Always
+
+          # Container port the Python HTTP server listens on
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+
+          # Environment variables (non-sensitive)
+          env:
+            - name: PORT
+              value: "8000"
+
+          # Liveness probe – restarts container if it becomes unresponsive
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          # Readiness probe – removes pod from service if not ready
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+          # Resource limits to prevent resource starvation
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+
+      # Graceful termination
+      terminationGracePeriodSeconds: 30

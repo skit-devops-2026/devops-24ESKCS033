@@ -1,0 +1,39 @@
+# ============================================================
+# Kubernetes Service Manifest
+# RealEstate – Property Discovery Platform
+# ============================================================
+# Exposes the Deployment pods via a NodePort so the app is
+# reachable from outside the kind/k3d cluster.
+# ============================================================
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: realestate-service
+  namespace: default
+  labels:
+    app: realestate
+    project: realestate-platform
+    course: devops-24ESKCS033
+    student: 24ESKCS019
+  annotations:
+    description: "NodePort service exposing the RealEstate deployment on port 30080"
+
+spec:
+  # NodePort exposes the service on each Node's IP at a static port.
+  # Accessible at: http://<node-ip>:30080
+  type: NodePort
+
+  # Selector must exactly match the Deployment's pod labels
+  selector:
+    app: realestate
+
+  ports:
+    - name: http
+      protocol: TCP
+      # Port on which the service is exposed (cluster-internal)
+      port: 80
+      # Port the container listens on (must match containerPort in Deployment)
+      targetPort: 8000
+      # Static NodePort for external access (30000–32767 range)
+      nodePort: 30080

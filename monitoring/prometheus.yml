@@ -1,0 +1,64 @@
+# ============================================================
+# Prometheus Configuration
+# RealEstate – Property Discovery Platform
+# ============================================================
+#
+# Architecture note:
+# The application is a static site served by Python's built-in
+# HTTP server. It has no native /metrics endpoint.
+# Monitoring strategy:
+#   1. Blackbox Exporter – HTTP availability & latency probing
+#   2. Node Exporter    – Host CPU, memory, disk metrics
+#   3. Prometheus self-monitoring
+# ============================================================
+
+global:
+  scrape_interval: 15s          # How often to scrape targets
+  evaluation_interval: 15s      # How often to evaluate rules
+  scrape_timeout: 10s
+
+  external_labels:
+    project: 'realestate-platform'
+    env: 'production'
+    student: '24ESKCS019'
+
+# ── Alerting (optional Alertmanager integration) ─────────────
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []            # Add alertmanager host here if needed
+
+# ── Scrape configurations ────────────────────────────────────
+scrape_configs:
+
+  # 1. Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          instance: 'prometheus-server'
+
+  # 2. Blackbox Exporter – HTTP probe (availability & response time)
+  #    Probes the RealEstate application HTTP endpoint.
+  - job_name: 'realestate-http-probe'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]          # Expect HTTP 200-299 response
+    static_configs:
+      - targets:
+          - 'http://realestate-app:8000'     # Docker Compose target
+          - 'http://localhost:8000'           # Local dev target
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 'blackbox-exporter:9115' # Blackbox exporter address
+
+  # 3. Node Exporter – Host system metrics (CPU, memory, disk, network)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+        labels:
+          instance: 'realestate-host'
