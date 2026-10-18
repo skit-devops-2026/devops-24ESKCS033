@@ -1,44 +1,40 @@
 # ============================================================
-# GitHub Actions – Docker Build, Push & Deployment Pipeline
-# RealEstate – Property Discovery Platform
-# M5: Docker image build + push to Docker Hub
+# GitHub Actions – Full DevOps Verification Pipeline
+# M5: Docker Build + Push to Docker Hub
+# M7: Kubernetes deployment via kind + screenshot capture
 # ============================================================
 
-name: Docker Build & Push
+name: Docker Build, Push & Kubernetes Verify
 
 on:
   push:
     branches: [ "main" ]
-  workflow_dispatch:      # Allow manual trigger from Actions tab
+  workflow_dispatch:
 
 jobs:
-  docker:
-    name: Build & Push Docker Image
+  # ─────────────────────────────────────────────────────────
+  # JOB 1: Docker Build + Push (M5)
+  # ─────────────────────────────────────────────────────────
+  docker-build-push:
+    name: M5 – Docker Build & Push
     runs-on: ubuntu-latest
 
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+
     steps:
-      # 1. Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Set up QEMU for multi-platform builds (optional but good practice)
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      # 3. Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # 4. Log in to Docker Hub using GitHub Secrets
-      #    Add secrets: DOCKERHUB_USERNAME and DOCKERHUB_TOKEN
-      #    in your repo Settings → Secrets and Variables → Actions
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 5. Build and push the Docker image
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -51,17 +47,190 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # 6. Verify the image is accessible
-      - name: Verify image pull
+      - name: Verify container runs correctly
         run: |
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/realestate-platform:latest
-          docker run --rm -d -p 8000:8000 --name test-container \
+          docker run -d -p 8000:8000 --name realestate-verify \
             ${{ secrets.DOCKERHUB_USERNAME }}/realestate-platform:latest
           sleep 5
-          curl -f http://localhost:8000 && echo "✅ Container is responding on port 8000"
-          docker stop test-container
-          echo "✅ Docker image verified successfully"
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000)
+          echo "HTTP Status: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" = "200" ]; then
+            echo "✅ Container is running and responding with HTTP 200"
+          else
+            echo "❌ Container health check failed"
+            docker logs realestate-verify
+            exit 1
+          fi
+          docker stop realestate-verify
+          echo "✅ M5 Docker verification complete"
+          echo "Image: ${{ secrets.DOCKERHUB_USERNAME }}/realestate-platform:latest"
 
-      # 7. Print image digest
-      - name: Image digest
-        run: echo "Docker image pushed successfully → ${{ secrets.DOCKERHUB_USERNAME }}/realestate-platform:latest"
+  # ─────────────────────────────────────────────────────────
+  # JOB 2: Kubernetes Verification via kind (M7)
+  # ─────────────────────────────────────────────────────────
+  kubernetes-verify:
+    name: M7 – Kubernetes Verification (kind)
+    runs-on: ubuntu-latest
+    needs: docker-build-push
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install kind
+        run: |
+          curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.23.0/kind-linux-amd64
+          chmod +x ./kind
+          sudo mv ./kind /usr/local/bin/kind
+          kind version
+
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/kubectl
+          kubectl version --client
+
+      - name: Create kind cluster
+        run: |
+          kind create cluster --name realestate --wait 60s
+          kubectl cluster-info --context kind-realestate
+          echo "✅ kind cluster created"
+
+      - name: Update k8s manifests with actual image
+        run: |
+          # Replace image with the actual pushed image (using DOCKERHUB_USERNAME secret if available)
+          IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/realestate-platform:latest"
+          # If DOCKERHUB_USERNAME secret not set, use akshat2026 as default
+          if [ -z "${{ secrets.DOCKERHUB_USERNAME }}" ]; then
+            IMAGE="akshat2026/realestate-platform:latest"
+          fi
+          echo "Using image: $IMAGE"
+          sed -i "s|akshat2026/realestate-platform:latest|$IMAGE|g" k8s/deployment.yaml
+          cat k8s/deployment.yaml | grep image:
+
+      - name: Pull image into kind cluster
+        run: |
+          IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/realestate-platform:latest"
+          if [ -z "${{ secrets.DOCKERHUB_USERNAME }}" ]; then
+            IMAGE="akshat2026/realestate-platform:latest"
+          fi
+          docker pull "$IMAGE"
+          kind load docker-image "$IMAGE" --name realestate
+          echo "✅ Image loaded into kind cluster"
+
+      - name: Apply Kubernetes manifests
+        run: |
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+          echo "✅ Manifests applied"
+          echo ""
+          echo "=== Deployments ==="
+          kubectl get deployments
+          echo ""
+          echo "=== Services ==="
+          kubectl get services
+
+      - name: Wait for pods to be Ready
+        run: |
+          echo "Waiting for pods to reach Ready state..."
+          kubectl rollout status deployment/realestate-deployment --timeout=120s
+          echo "✅ Deployment rollout complete"
+
+      - name: Capture kubectl get pods output
+        run: |
+          echo "=== kubectl get pods ==="
+          kubectl get pods -o wide
+          echo ""
+          echo "=== kubectl get deployments ==="
+          kubectl get deployments
+          echo ""
+          echo "=== kubectl get services ==="
+          kubectl get services
+          echo ""
+          echo "=== Pod describe (first pod) ==="
+          POD=$(kubectl get pods -l app=realestate -o jsonpath='{.items[0].metadata.name}')
+          kubectl describe pod "$POD"
+
+      - name: Install screenshot tools and capture pods screenshot
+        run: |
+          # Install xvfb and imagemagick for terminal screenshot
+          sudo apt-get update -qq
+          sudo apt-get install -y imagemagick xterm xvfb -qq
+
+          # Create a text-based screenshot using the kubectl output
+          mkdir -p docs
+
+          # Generate a styled terminal screenshot using convert (ImageMagick)
+          kubectl get pods -o wide > /tmp/pods_output.txt
+          kubectl get deployments >> /tmp/pods_output.txt
+          kubectl get services >> /tmp/pods_output.txt
+
+          # Create a properly formatted image
+          cat /tmp/pods_output.txt
+
+          # Use ImageMagick to create a terminal-style screenshot
+          convert -size 900x400 xc:#1e1e2e \
+            -font "DejaVu-Sans-Mono" -pointsize 14 -fill '#cdd6f4' \
+            -annotate +20+30 "$(echo 'Student: Akshat Gupta | ID: 24ESKCS019 | Course: DevOps 24ESKCS033')" \
+            -annotate +20+55 "$(echo 'Cluster: kind-realestate | Image: akshat2026/realestate-platform:latest')" \
+            -fill '#89b4fa' \
+            -annotate +20+90 "$(echo '$ kubectl get pods -o wide')" \
+            -fill '#a6e3a1' \
+            -annotate +20+115 "$(kubectl get pods -o wide 2>&1)" \
+            -fill '#89b4fa' \
+            -annotate +20+165 "$(echo '$ kubectl get deployments')" \
+            -fill '#a6e3a1' \
+            -annotate +20+190 "$(kubectl get deployments 2>&1)" \
+            -fill '#89b4fa' \
+            -annotate +20+240 "$(echo '$ kubectl get services')" \
+            -fill '#a6e3a1' \
+            -annotate +20+265 "$(kubectl get services 2>&1)" \
+            -fill '#f38ba8' \
+            -annotate +20+320 "$(echo '✅ All pods are READY | kind cluster verified | M7 Complete')" \
+            docs/kubernetes-pods.png
+
+          echo "✅ kubernetes-pods.png created"
+          ls -la docs/
+
+      - name: Upload kubernetes-pods.png as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kubernetes-pods-screenshot
+          path: docs/kubernetes-pods.png
+          retention-days: 30
+
+      - name: Commit kubernetes-pods.png to repository
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add docs/kubernetes-pods.png
+          git diff --staged --quiet || git commit -m "docs: Add kubernetes-pods.png from kind cluster verification [skip ci]"
+          git push origin main || echo "Push failed - will use artifact instead"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ─────────────────────────────────────────────────────────
+  # JOB 3: Test summary
+  # ─────────────────────────────────────────────────────────
+  summary:
+    name: Verification Summary
+    runs-on: ubuntu-latest
+    needs: [docker-build-push, kubernetes-verify]
+    if: always()
+
+    steps:
+      - name: Print summary
+        run: |
+          echo "================================================"
+          echo "  DevOps M5 + M7 Verification Summary"
+          echo "  Student: Akshat Gupta (24ESKCS019)"
+          echo "  Course : DevOps 24ESKCS033"
+          echo "================================================"
+          echo ""
+          echo "M5 Docker Build+Push : ${{ needs.docker-build-push.result }}"
+          echo "M7 Kubernetes (kind) : ${{ needs.kubernetes-verify.result }}"
+          echo ""
+          echo "Image: akshat2026/realestate-platform:latest"
+          echo "Registry: https://hub.docker.com/r/akshat2026/realestate-platform"
